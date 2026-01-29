@@ -14,8 +14,9 @@ class WeightOut(WeightBase):
     id: int
     user_id: int
     week_num: str
-    class Config:
-        from_attributes = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class WeightUpdate(BaseModel):
     weight: float

@@ -1,0 +1,27 @@
+:global {
+  .custom-tabs {
+    .ant-tabs-nav::before {
+      border-bottom: none;
+    }
+
+    .ant-tabs-tab {
+      border: 1px solid #e5e7eb !important;
+      border-radius: 8px !important;
+      padding: 8px 16px !important;
+      transition: all 0.3s;
+    }
+
+    .ant-tabs-tab-active {
+      background: #e8f7ef;
+      border-color: #00b42a;
+
+      .ant-tabs-tab-btn {
+        color: #00b42a;
+      }
+    }
+
+    .ant-tabs-ink-bar {
+      display: none;
+    }
+  }
+}

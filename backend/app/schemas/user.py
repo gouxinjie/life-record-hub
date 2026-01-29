@@ -21,8 +21,9 @@ class UserOut(UserBase):
     id: int
     username: str
     
-    class Config:
-        from_attributes = True
+    model_config = {
+        "from_attributes": True
+    }
 
 # Token 响应
 class Token(BaseModel):

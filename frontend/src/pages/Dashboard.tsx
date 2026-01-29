@@ -35,14 +35,15 @@ const Dashboard: React.FC = () => {
     const fetchDashboardData = async () => {
         setLoading(true);
         try {
-            const [notes, todos, dailyCheckin, weightRecords]: any = await Promise.all([
+            const [notes, todos, dailyCheckinData, weightRecords]: any = await Promise.all([
                 getNotes({ limit: 3 }),
                 getTodos({ status: 0 }),
-                getDailyCheckin(),
+                getDailyCheckin(dayjs().format('YYYY-MM-DD')),
                 getWeightRecords()
             ]);
 
-            const completedCheckin = dailyCheckin.filter((s: any) => s.record?.check_status === 1).length;
+            const dailyCheckin = dailyCheckinData.items || [];
+            const completedCheckin = dailyCheckin.filter((s: any) => s.check_status === 1).length;
             const totalCheckin = dailyCheckin.length;
 
             setStats({

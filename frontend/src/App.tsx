@@ -3,7 +3,7 @@ import Login from './pages/Login'
 import MainLayout from './components/MainLayout'
 import NoteList from './pages/Note'
 import TodoList from './pages/Todo'
-import Checkin from './pages/Checkin'
+import Checkin from './pages/Checkin/index'
 import Weight from './pages/Weight'
 import Dashboard from './pages/Dashboard'
 

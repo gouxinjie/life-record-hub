@@ -53,30 +53,33 @@ CREATE TABLE IF NOT EXISTS `todo` (
 CREATE TABLE IF NOT EXISTS `checkin_item` (
     `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '打卡项唯一ID',
     `user_id` BIGINT NOT NULL COMMENT '关联用户ID',
+    `category_path` VARCHAR(100) DEFAULT NULL COMMENT '关联前端路由路径（二级分类）',
     `item_name` VARCHAR(50) NOT NULL COMMENT '打卡项名称',
     `icon` VARCHAR(255) DEFAULT NULL COMMENT '打卡项图标路径',
     `status` TINYINT(1) DEFAULT 1 COMMENT '状态：1=启用，0=禁用',
-    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX `idx_user_id` (`user_id`)
+    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    INDEX `idx_user_id` (`user_id`),
+    INDEX `idx_category_path` (`category_path`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- 4.7 打卡记录表
 CREATE TABLE IF NOT EXISTS `checkin_record` (
-    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-    `user_id` BIGINT NOT NULL,
-    `item_id` BIGINT NOT NULL,
-    `check_date` DATE NOT NULL,
-    `check_status` TINYINT(1) DEFAULT 0,
-    `item_remark` VARCHAR(200) DEFAULT NULL,
-    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '打卡记录唯一ID',
+    `user_id` BIGINT NOT NULL COMMENT '关联用户ID',
+    `item_id` BIGINT NOT NULL COMMENT '关联打卡项ID',
+    `check_date` DATE NOT NULL COMMENT '打卡日期',
+    `check_status` TINYINT(1) DEFAULT 0 COMMENT '打卡状态：0=未完成，1=已完成',
+    `item_remark` VARCHAR(200) DEFAULT NULL COMMENT '打卡备注',
+    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     UNIQUE INDEX `uk_user_item_date` (
         `user_id`,
         `item_id`,
         `check_date`
     ),
-    INDEX `idx_user_date` (`user_id`, `check_date`)
+    INDEX `idx_user_date` (`user_id`, `check_date`),
+    CONSTRAINT `fk_checkin_record_item` FOREIGN KEY (`item_id`) REFERENCES `checkin_item` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- 4.8 体重记录表
