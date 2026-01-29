@@ -1,0 +1,91 @@
+.notePageContainer {
+  :global {
+    .ql-container {
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      font-size: 16px;
+    }
+
+    .ql-toolbar {
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+  }
+}
+
+/* 
+  由于 Ant Design Modal 使用 Portal 渲染在 body 下，不在 .notePageContainer 内部，
+  所以我们将预览相关的 .prose 样式提取为全局作用域（但仍通过模块文件管理）
+*/
+:global {
+
+  .preview-modal,
+  .note-page-container {
+    .prose {
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1.25rem;
+        font-weight: 700;
+        color: #111827;
+      }
+
+      h2 {
+        font-size: 1.25rem;
+        margin-top: 1.75rem;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      p {
+        margin-bottom: 1.25rem;
+        line-height: 1.75;
+        color: #374151;
+      }
+
+      /* 行内代码样式 */
+      :not(pre)>code {
+        background: #f1f5f9;
+        color: #e11d48;
+        padding: 0.2rem 0.45rem;
+        border-radius: 6px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.875em;
+        border: 1px solid #e2e8f0;
+      }
+
+      /* 代码块样式 */
+      pre {
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 12px;
+        overflow-x: auto;
+        border: 1px solid #1e293b;
+        box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        margin: 1.5rem 0;
+        line-height: 1.6;
+
+        code {
+          background: transparent;
+          padding: 0;
+          border: none;
+          color: inherit;
+          font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+          font-size: 0.9rem;
+        }
+      }
+
+      ul,
+      ol {
+        padding-left: 1.5rem;
+        margin-bottom: 1.25rem;
+        color: #374151;
+      }
+
+      li {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+}

@@ -1,0 +1,246 @@
+/** 待办页面样式模块
+ * 布局结构：
+ * - .todoWrapper：页面整体容器
+ * - .sidebar：左侧筛选与搜索区域
+ * - .mainContent：右侧主内容（标题/筛选/列表）
+ * 交互说明：
+ * - 卡片 hover 显示 .actionBtn，避免常驻遮挡
+ */
+.todoWrapper {
+  display: flex;
+  height: calc(100vh - 120px);
+  margin: -24px; // Offset the padding from Content in MainLayout
+  background: #f5f7fa;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* 左侧侧边栏 */
+.sidebar {
+  width: 240px;
+  background: white;
+  border-right: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+
+  .searchBox {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    :global(.ant-input-affix-wrapper) {
+      border-radius: 20px;
+      background: #f5f7fa;
+      border: none;
+    }
+  }
+
+  .addButton {
+    width: 40px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+  }
+}
+
+.menuItem {
+  display: flex;
+/* 侧边栏菜单项 */
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 4px;
+  color: #646a73;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f2f3f5;
+  }
+
+  &.active {
+    background: #e1eaff;
+    color: #1f51ff;
+
+    .icon {
+      color: #1f51ff;
+    }
+  }
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+  }
+
+  .icon {
+    font-size: 18px;
+    color: #8f959e;
+  }
+
+  .count {
+    font-size: 12px;
+    color: #8f959e;
+  }
+}
+
+/* 主内容区 */
+.mainContent {
+  flex: 1;
+  background: #f5f7fa;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    margin-bottom: 16px;
+
+    .title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1f2329;
+      margin-bottom: 16px;
+    }
+
+    .titleWrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .cornerBadge {
+      position: absolute;
+      top: -6px;
+      right: -12px;
+      background: #ff4d4f;
+      color: #fff;
+      border-radius: 10px;
+      padding: 0 6px;
+      height: 16px;
+      line-height: 16px;
+      font-size: 12px;
+      box-shadow: 0 0 0 2px #fff;
+      pointer-events: none;
+    }
+
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      color: #646a73;
+      font-size: 14px;
+
+      span {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        &:hover {
+          color: #1f51ff;
+        }
+      }
+    }
+  }
+}
+
+/* 待办列表容器 */
+.todoList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 待办卡片样式 */
+.todoCard {
+  background: white;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  position: relative;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: #e1eaff;
+  }
+
+  .checkbox {
+    margin-top: 4px;
+  }
+
+  .content {
+    flex: 1;
+
+    .title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #1f2329;
+      margin-bottom: 8px;
+
+      &.completed {
+        color: #8f959e;
+        text-decoration: line-through;
+      }
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 12px;
+      color: #8f959e;
+
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        &.deadline {
+          color: #1f51ff;
+        }
+      }
+    }
+  }
+
+  .actionBtn {
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  &:hover .actionBtn {
+    opacity: 1;
+  }
+}
+
+/* 空状态 */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  color: #8f959e;
+}
+
+/* 已完成标识 */
+.completedBadge {
+  color: #8f959e;
+  font-size: 12px;
+  border: 1px solid #f0f0f0;
+  padding: 2px 8px;
+  border-radius: 4px;
+}

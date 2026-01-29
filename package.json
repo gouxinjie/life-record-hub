@@ -1,0 +1,17 @@
+{
+  "name": "life-record-hub",
+  "version": "1.0.0",
+  "description": "life-record-hub 生活记录中心 Monorepo",
+  "scripts": {
+    "frontend:dev": "cd frontend && pnpm dev",
+    "backend:dev": "cd backend && uvicorn app.main:app --reload --port 8000",
+    "dev:all": "concurrently \"npm run frontend:dev\" \"npm run backend:dev\"",
+    "install:all": "cd frontend && pnpm install && cd ../backend && pip install -r requirements.txt"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
