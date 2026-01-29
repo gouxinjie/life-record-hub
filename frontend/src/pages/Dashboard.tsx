@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Card, Statistic, List, Typography, Space, Button, Progress, Tag, Modal, Form, InputNumber, Input, message } from 'antd';
+import { Row, Col, Card, Statistic, List, Typography, Space, Button, Progress, Tag, Modal, Form, InputNumber, Input, App } from 'antd';
 import {
     EditOutlined,
     CheckCircleOutlined,
@@ -14,10 +14,13 @@ import { getTodos } from '../services/todo';
 import { getDailyCheckin } from '../services/checkin';
 import { getWeightRecords, addWeightRecord } from '../services/weight';
 import dayjs from 'dayjs';
+import { useTheme } from '../context/ThemeContext';
 
 const { Title, Text } = Typography;
 
 const Dashboard: React.FC = () => {
+    const { message } = App.useApp();
+    const { primaryColor } = useTheme();
     const navigate = useNavigate();
     const [stats, setStats] = useState({
         notes: [],
@@ -88,10 +91,10 @@ const Dashboard: React.FC = () => {
                             title="今日打卡进度"
                             value={stats.checkinProgress}
                             suffix="%"
-                            valueStyle={{ color: '#00B42A' }}
+                            valueStyle={{ color: primaryColor }}
                             prefix={<CheckCircleOutlined />}
                         />
-                        <Progress percent={stats.checkinProgress} strokeColor="#00B42A" showInfo={false} />
+                        <Progress percent={stats.checkinProgress} strokeColor={primaryColor} showInfo={false} />
                         <Text type="secondary" className="text-xs">已完成 {stats.checkinStats.completed}/{stats.checkinStats.total}</Text>
                     </Card>
                 </Col>
@@ -122,7 +125,7 @@ const Dashboard: React.FC = () => {
                                 type="primary" 
                                 size="small" 
                                 icon={<PlusOutlined />} 
-                                className="bg-green-500 rounded-lg text-[10px]"
+                                className="bg-primary rounded-lg text-[10px]"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setIsWeightModalOpen(true);
@@ -164,7 +167,7 @@ const Dashboard: React.FC = () => {
                                         title={item.title}
                                         description={dayjs(item.update_time).format('MM-DD HH:mm')}
                                     />
-                                    <Tag color="green">笔记</Tag>
+                                    <Tag color={primaryColor}>笔记</Tag>
                                 </List.Item>
                             )}
                         />

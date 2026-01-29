@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Menu, Button, theme, Typography, Space, Dropdown, Avatar } from "antd";
-import { MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined, LogoutOutlined, BookOutlined } from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined, LogoutOutlined, BookOutlined, SkinOutlined } from "@ant-design/icons";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { getMe } from "../services/auth";
 import { routes } from "../router";
+import { useTheme } from "../context/ThemeContext";
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
 
 const MainLayout: React.FC = () => {
+  const { theme, setTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
@@ -84,6 +86,13 @@ const MainLayout: React.FC = () => {
             className="text-lg w-10 h-10 flex items-center justify-center"
           />
           <Space size={16}>
+            <Button
+              type="text"
+              icon={<SkinOutlined />}
+              onClick={() => setTheme(theme === 'green' ? 'blue' : 'green')}
+            >
+              {theme === 'green' ? '切换蓝调' : '切换绿调'}
+            </Button>
             <Dropdown menu={{ items: userMenuItems }}>
               <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-lg transition-colors">
                 <Avatar className="bg-primary-light text-primary">{user?.nickname?.[0]?.toUpperCase() || <UserOutlined />}</Avatar>

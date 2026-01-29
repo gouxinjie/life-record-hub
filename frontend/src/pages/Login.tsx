@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, Typography, message, Space } from 'antd';
+import { Form, Input, Button, Card, Typography, Space, App } from 'antd';
 import { UserOutlined, LockOutlined, RocketFilled } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { login, register } from '../services/auth';
@@ -7,6 +7,7 @@ import { login, register } from '../services/auth';
 const { Title, Text } = Typography;
 
 const Login: React.FC = () => {
+    const { message } = App.useApp();
     const [loading, setLoading] = useState(false);
     const [isLogin, setIsLogin] = useState(true);
     const navigate = useNavigate();
@@ -49,7 +50,7 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="h-screen flex justify-center items-center bg-gradient-to-br from-primary-light to-[#D1E9D2]">
+        <div className="h-screen flex justify-center items-center bg-gradient-to-br from-primary-light to-[var(--scroll-thumb)]">
             <Card
                 className="w-[400px] shadow-2xl rounded-2xl border border-white/50 backdrop-blur-md"
                 bodyStyle={{ padding: '40px 32px' }}
@@ -113,7 +114,7 @@ const Login: React.FC = () => {
                             htmlType="submit"
                             loading={loading}
                             block
-                            className="h-12 rounded-lg text-lg bg-primary shadow-lg shadow-primary/20 hover:!bg-primary-dark"
+                            className="h-12 rounded-lg text-lg bg-primary shadow-lg hover:!bg-primary-dark"
                         >
                             {isLogin ? '立即登录' : '注册账户'}
                         </Button>

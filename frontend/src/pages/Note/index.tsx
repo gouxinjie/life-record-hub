@@ -10,10 +10,12 @@ import 'react-quill-new/dist/quill.snow.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import styles from './index.module.scss';
+import { useTheme } from '@/context/ThemeContext';
 
 const { Title, Paragraph, Text } = Typography;
 
 const NoteList: React.FC = () => {
+    const { primaryColor, theme } = useTheme();
     const location = useLocation();
     const { message, modal } = AntdApp.useApp(); // 使用 App hook 获取静态方法
     const [notes, setNotes] = useState<any[]>([]);
@@ -184,24 +186,24 @@ const NoteList: React.FC = () => {
                     <List.Item className="h-full">
                         <Card
                             hoverable
-                            className="rounded-xl h-full border border-gray-100 hover:border-blue-400/50 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden"
+                            className="rounded-xl h-full border border-gray-100 hover:border-primary/50 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden"
                             onClick={() => handlePreview(item)}
                             actions={[
-                                <div className="hover:text-blue-500 transition-colors"><EyeOutlined key="view" /></div>,
-                                <div className="hover:text-blue-500 transition-colors"><EditOutlined key="edit" onClick={(e) => handleEdit(item, e)} /></div>,
+                                <div className="hover:text-primary transition-colors"><EyeOutlined key="view" /></div>,
+                                <div className="hover:text-primary transition-colors"><EditOutlined key="edit" onClick={(e) => handleEdit(item, e)} /></div>,
                                 <div className="hover:text-red-500 transition-colors"><DeleteOutlined key="delete" className="text-red-400 group-hover:text-red-500" onClick={(e) => handleDelete(item.id, e)} /></div>,
                             ]}
                             styles={{ body: { height: 180, display: 'flex', flexDirection: 'column', padding: '16px' } }}
                         >
                             <div className="mb-3 flex justify-between items-start">
-                                <Tag color={item.content_type === 1 ? 'blue' : 'green'} className="rounded-md border-none px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider">
+                                <Tag color={item.content_type === 1 ? (theme === 'green' ? 'blue' : 'cyan') : primaryColor} className="rounded-md border-none px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider">
                                     {item.content_type === 1 ? 'Markdown' : 'Rich Text'}
                                 </Tag>
                                 <Text className="text-gray-400 text-[11px] font-medium">
                                     {dayjs(item.update_time).format('YYYY-MM-DD')}
                                 </Text>
                             </div>
-                            <Title level={5} className="!mt-0 !mb-2 text-gray-800 group-hover:text-blue-600 transition-colors leading-snug" ellipsis={{ rows: 2 }}>
+                            <Title level={5} className="!mt-0 !mb-2 text-gray-800 group-hover:text-primary transition-colors leading-snug" ellipsis={{ rows: 2 }}>
                                 {item.title}
                             </Title>
                             <Paragraph

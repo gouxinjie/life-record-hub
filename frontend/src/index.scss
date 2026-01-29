@@ -3,9 +3,23 @@
 @tailwind utilities;
 
 :root {
+  /* Default Green Theme */
   --primary-color: #00b42a;
-  --bg-color: #e8f7ef;
-  --dark-green: #00891e;
+  --primary-dark: #00891e;
+  --primary-light: #e8f7ef;
+  --scroll-thumb: #d1e9d2;
+  
+  /* Aliases for backward compatibility */
+  --bg-color: var(--primary-light);
+  --dark-green: var(--primary-dark);
+}
+
+[data-theme='blue'] {
+  /* Blue Theme */
+  --primary-color: #1677ff;
+  --primary-dark: #0958d9;
+  --primary-light: #e6f4ff;
+  --scroll-thumb: #bae0ff;
 }
 
 html,
@@ -31,7 +45,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1e9d2;
+  background: var(--scroll-thumb);
   border-radius: 3px;
 }
 

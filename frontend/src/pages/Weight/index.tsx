@@ -10,14 +10,14 @@ import {
   InputNumber,
   Input,
   DatePicker,
-  message,
   Row,
   Col,
   Statistic,
   Tabs,
   Popconfirm,
   Tag,
-  Tooltip
+  Tooltip,
+  App
 } from "antd";
 import {
   PlusOutlined,
@@ -50,6 +50,7 @@ import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import styles from "./index.module.scss";
 import { DownloadOutlined, CalendarOutlined } from "@ant-design/icons";
+import { useTheme } from "../../context/ThemeContext";
 
 dayjs.extend(isoWeek);
 
@@ -58,6 +59,8 @@ const { TabPane } = Tabs;
 const { RangePicker } = DatePicker;
 
 const Weight: React.FC = () => {
+  const { message } = App.useApp();
+  const { primaryColor } = useTheme();
   // --- 状态管理 ---
   const [activeTab, setActiveTab] = useState("weekly");
   const [currentWeek, setCurrentWeek] = useState(dayjs());
@@ -223,7 +226,7 @@ const Weight: React.FC = () => {
       dataIndex: "weight",
       key: "weight",
       render: (val: number) => (
-        <Text strong className={val === weeklyData.max_weight ? "text-red-500" : val === weeklyData.min_weight ? "text-green-500" : ""}>
+        <Text strong className={val === weeklyData.max_weight ? "text-red-500" : val === weeklyData.min_weight ? "text-primary" : ""}>
           {val}
         </Text>
       )
@@ -278,8 +281,8 @@ const Weight: React.FC = () => {
               <AreaChart data={getChartData(data.records)}>
                 <defs>
                   <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#00B42A" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#00B42A" stopOpacity={0} />
+                    <stop offset="5%" stopColor={primaryColor} stopOpacity={0.1} />
+                    <stop offset="95%" stopColor={primaryColor} stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
@@ -291,7 +294,7 @@ const Weight: React.FC = () => {
                       return (
                         <div className="bg-white p-3 shadow-lg rounded-lg border border-gray-100">
                           <div className="text-xs text-gray-400 mb-1">{payload[0].payload.date}</div>
-                          <div className="text-lg font-bold text-green-600">{payload[0].value} kg</div>
+                          <div className="text-lg font-bold" style={{ color: primaryColor }}>{payload[0].value} kg</div>
                           {payload[0].payload.remark && <div className="text-xs text-gray-500 mt-1 italic">"{payload[0].payload.remark}"</div>}
                         </div>
                       );
@@ -302,11 +305,11 @@ const Weight: React.FC = () => {
                 <Area
                   type="monotone"
                   dataKey="weight"
-                  stroke="#00B42A"
+                  stroke={primaryColor}
                   strokeWidth={3}
                   fillOpacity={1}
                   fill="url(#colorWeight)"
-                  dot={{ r: 4, fill: "#00B42A", strokeWidth: 2, stroke: "#fff" }}
+                  dot={{ r: 4, fill: primaryColor, strokeWidth: 2, stroke: "#fff" }}
                   activeDot={{ r: 6, strokeWidth: 0 }}
                 />
               </AreaChart>
@@ -430,7 +433,7 @@ const Weight: React.FC = () => {
               });
               setIsRecordModalOpen(true);
             }}
-            className="bg-green-500 h-10 px-6 rounded-xl"
+            className="bg-primary h-10 px-6 rounded-xl"
           >
             记录体重
           </Button>
@@ -491,7 +494,7 @@ const Weight: React.FC = () => {
               </div>
               <div className="flex justify-between items-center">
                 <Text type="secondary">本周最低</Text>
-                <Statistic value={weeklyData.min_weight || "-"} suffix="kg" valueStyle={{ color: "#00B42A", fontSize: 20 }} />
+                <Statistic value={weeklyData.min_weight || "-"} suffix="kg" valueStyle={{ color: primaryColor, fontSize: 20 }} />
               </div>
             </div>
           </Card>

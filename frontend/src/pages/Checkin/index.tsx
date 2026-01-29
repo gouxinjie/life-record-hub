@@ -11,7 +11,6 @@ import {
   Form,
   Input,
   Modal,
-  message,
   Empty,
   Statistic,
   Row,
@@ -20,6 +19,7 @@ import {
   Table,
   Tag,
   Popconfirm,
+  App
 } from "antd";
 import {
   PlusOutlined,
@@ -43,11 +43,14 @@ import {
 } from "../../services/checkin";
 import dayjs from "dayjs";
 import "./index.module.scss";
+import { useTheme } from "../../context/ThemeContext";
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
 const Checkin: React.FC = () => {
+  const { message } = App.useApp();
+  const { primaryColor } = useTheme();
   // --- 状态管理 ---
   const [activeTab, setActiveTab] = useState("daily");
   const [targetDate, setTargetDate] = useState(dayjs());
@@ -188,7 +191,7 @@ const Checkin: React.FC = () => {
               suffix="%"
               prefix={<FireFilled className="text-orange-500" />}
             />
-            <Progress percent={dailyData.stat.completion_rate || 0} strokeColor="#00B42A" showInfo={false} className="mt-2" />
+            <Progress percent={dailyData.stat.completion_rate || 0} strokeColor={primaryColor} showInfo={false} className="mt-2" />
           </Card>
         </Col>
         <Col span={8}>
@@ -211,7 +214,7 @@ const Checkin: React.FC = () => {
         renderItem={(item: any) => (
           <List.Item>
             <Card
-              className={`rounded-2xl transition-all duration-300 ${item.check_status === 1 ? "bg-green-50 border-green-200" : "bg-white"}`}
+              className={`rounded-2xl transition-all duration-300 ${item.check_status === 1 ? "bg-primary-light border-primary/20" : "bg-white"}`}
               hoverable
               styles={{ body: { padding: "16px" } }}
             >
@@ -219,7 +222,7 @@ const Checkin: React.FC = () => {
                 <Space size={12}>
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
-                      item.check_status === 1 ? "bg-green-500 text-white" : "bg-gray-100 text-gray-400"
+                      item.check_status === 1 ? "bg-primary text-white" : "bg-gray-100 text-gray-400"
                     }`}
                   >
                     {item.item_name[0]}
@@ -255,13 +258,13 @@ const Checkin: React.FC = () => {
         title: "状态",
         dataIndex: "status",
         key: "status",
-        render: (status: number) => <Tag color={status === 1 ? "green" : "default"}>{status === 1 ? "启用中" : "已禁用"}</Tag>
+        render: (status: number) => <Tag color={status === 1 ? primaryColor : "default"}>{status === 1 ? "启用中" : "已禁用"}</Tag>
       },
       {
         title: "累计打卡",
         dataIndex: "complete_count",
         key: "count",
-        render: (count: number) => <Text className="text-green-600 font-bold">{count} 次</Text>
+        render: (count: number) => <Text className="text-primary font-bold">{count} 次</Text>
       },
       {
         title: "操作",
@@ -303,7 +306,7 @@ const Checkin: React.FC = () => {
               itemForm.resetFields();
               setIsItemModalOpen(true);
             }}
-            className="bg-green-500"
+            className="bg-primary"
           >
             新增打卡项
           </Button>
@@ -325,11 +328,11 @@ const Checkin: React.FC = () => {
         renderItem={(record: any) => (
           <List.Item className="px-4 hover:bg-gray-50 rounded-lg transition-colors">
             <List.Item.Meta
-              avatar={<CheckCircleFilled className={record.check_status === 1 ? "text-green-500" : "text-gray-300"} />}
+              avatar={<CheckCircleFilled className={record.check_status === 1 ? "text-primary" : "text-gray-300"} />}
               title={
                 <Space>
                   <Text strong>{record.check_date}</Text>
-                  <Tag color="green">已完成</Tag>
+                  <Tag color={primaryColor}>已完成</Tag>
                 </Space>
               }
               description={

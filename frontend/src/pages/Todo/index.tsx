@@ -15,7 +15,6 @@ import {
     Tag,
     Modal,
     Form,
-    message,
     Typography,
     DatePicker,
     Select,
@@ -23,7 +22,8 @@ import {
     Avatar,
     Tooltip,
     Empty,
-    Drawer
+    Drawer,
+    App
 } from 'antd';
 import {
     PlusOutlined,
@@ -49,6 +49,7 @@ import { getMe } from '../../services/auth';
 import dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 import 'dayjs/locale/zh-cn';
+import { useTheme } from '../../context/ThemeContext';
 
 dayjs.extend(calendar);
 dayjs.locale('zh-cn');
@@ -77,6 +78,8 @@ type FilterType = 'todo' | 'priority' | 'starred' | 'done' | 'created' | 'involv
  * 待办列表主组件
  */
 const TodoList: React.FC = () => {
+    const { message, modal } = App.useApp();
+    const { primaryColor } = useTheme();
     // 状态：数据与界面
     const [todos, setTodos] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -199,7 +202,7 @@ const TodoList: React.FC = () => {
      */
     const handleDelete = (e: React.MouseEvent, id: number) => {
         e.stopPropagation();
-        Modal.confirm({
+        modal.confirm({
             title: '确认删除',
             content: '确定要删除这条待办事项吗？',
             okText: '确定',
@@ -368,7 +371,7 @@ const TodoList: React.FC = () => {
                                 />
                                 <div className={styles.content}>
                                     <div className={classNames(styles.title, { [styles.completed]: item.status === 1 })}>
-                                        {item.status === 1 && <span className="text-green-500 mr-2">✓</span>}
+                                        {item.status === 1 && <span className="text-primary mr-2">✓</span>}
                                         {item.title}
                                     </div>
                                     <div className={styles.meta}>
@@ -470,7 +473,7 @@ const TodoList: React.FC = () => {
                         <div className="flex items-center gap-4 text-gray-600">
                             <UserOutlined />
                             <Space>
-                                <Avatar size="small" icon={<UserOutlined />} className="bg-blue-500" />
+                                <Avatar size="small" icon={<UserOutlined />} className="bg-primary" />
                                 <span>{user?.nickname}</span>
                                 <Input placeholder="搜索执行人" bordered={false} className="w-40" />
                             </Space>
@@ -503,7 +506,7 @@ const TodoList: React.FC = () => {
 
                     <div className="flex justify-end gap-3 mt-10">
                         <Button onClick={() => setIsModalOpen(false)}>取消</Button>
-                        <Button type="primary" htmlType="submit" className="bg-blue-600 px-6">新建</Button>
+                        <Button type="primary" htmlType="submit" className="bg-primary px-6">新建</Button>
                     </div>
                 </Form>
             </Modal>
@@ -519,7 +522,7 @@ const TodoList: React.FC = () => {
                 {selectedTodo && (
                     <div className="flex flex-col gap-4">
                         <div className="flex justify-between items-center">
-                            <Tag color={selectedTodo.status === 1 ? 'green' : 'blue'}>
+                            <Tag color={selectedTodo.status === 1 ? primaryColor : 'default'}>
                                 {selectedTodo.status === 1 ? '已完成' : '进行中'}
                             </Tag>
                             <Tag color={priorityMap[selectedTodo.priority]?.color}>
