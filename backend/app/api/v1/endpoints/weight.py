@@ -294,21 +294,28 @@ def set_weight_target(
     current_user: User = Depends(deps.get_current_user),
 ) -> Any:
     """设置体重目标 (自动处理旧目标的 active 状态)"""
-    # 将旧目标设为非活跃
-    db.query(WeightTarget).filter(
-        WeightTarget.user_id == current_user.id,
-        WeightTarget.is_active == 1
-    ).update({"is_active": 0})
-    
-    db_obj = WeightTarget(
-        **target_in.model_dump(),
-        user_id=current_user.id,
-        is_active=1
-    )
-    db.add(db_obj)
-    db.commit()
-    db.refresh(db_obj)
-    return db_obj
+    try:
+        # 将旧目标设为非活跃
+        db.query(WeightTarget).filter(
+            WeightTarget.user_id == current_user.id,
+            WeightTarget.is_active == 1
+        ).update({"is_active": 0}, synchronize_session=False)
+        
+        db_obj = WeightTarget(
+            **target_in.model_dump(exclude={"is_active"}),
+            user_id=current_user.id,
+            is_active=1
+        )
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+    except Exception as e:
+        print(f"Error in set_weight_target: {e}")
+        import traceback
+        traceback.print_exc()
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 # --- 统计接口 ---
 

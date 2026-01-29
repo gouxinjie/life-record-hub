@@ -464,8 +464,8 @@ const Weight: React.FC = () => {
 
       {/* 统计数据卡片 */}
       <Row gutter={[16, 16]} className={styles.statsRow}>
-        <Col xs={12} sm={6}>
-          <Card>
+        <Col xs={12} sm={8}>
+          <Card className="h-full">
             <Statistic title="最新体重" value={todayStat.today_weight || "-"} suffix="kg" />
             <div className={`mt-1 ${styles.diffTag} ${todayStat.diff_yesterday > 0 ? styles.up : styles.down}`}>
               {todayStat.diff_yesterday > 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
@@ -473,8 +473,8 @@ const Weight: React.FC = () => {
             </div>
           </Card>
         </Col>
-        <Col xs={12} sm={6}>
-          <Card>
+        <Col xs={12} sm={8}>
+          <Card className="h-full">
             <Statistic title="本周平均" value={weeklyData.avg_weight || "-"} suffix="kg" />
             <div className={`mt-1 ${styles.diffTag} ${weeklyData.diff_last_week > 0 ? styles.up : styles.down}`}>
               {weeklyData.diff_last_week > 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
@@ -482,14 +482,18 @@ const Weight: React.FC = () => {
             </div>
           </Card>
         </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <Statistic title="本周最高" value={weeklyData.max_weight || "-"} suffix="kg" valueStyle={{ color: "#ff4d4f" }} />
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <Statistic title="本周最低" value={weeklyData.min_weight || "-"} suffix="kg" valueStyle={{ color: "#00B42A" }} />
+        <Col xs={24} sm={8}>
+          <Card className="h-full">
+            <div className="flex flex-col h-full justify-between gap-4">
+              <div className="flex justify-between items-center">
+                <Text type="secondary">本周最高</Text>
+                <Statistic value={weeklyData.max_weight || "-"} suffix="kg" valueStyle={{ color: "#ff4d4f", fontSize: 20 }} />
+              </div>
+              <div className="flex justify-between items-center">
+                <Text type="secondary">本周最低</Text>
+                <Statistic value={weeklyData.min_weight || "-"} suffix="kg" valueStyle={{ color: "#00B42A", fontSize: 20 }} />
+              </div>
+            </div>
           </Card>
         </Col>
       </Row>

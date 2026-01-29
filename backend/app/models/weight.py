@@ -37,5 +37,6 @@ class WeightTarget(Base):
     update_time = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
     __table_args__ = (
-        UniqueConstraint('user_id', 'is_active', name='uk_user_active'),
+        # 移除 is_active 的唯一索引，允许存在多条历史记录 (is_active=0)
+        # 代码层保证同一时间只有一个 is_active=1
     )
