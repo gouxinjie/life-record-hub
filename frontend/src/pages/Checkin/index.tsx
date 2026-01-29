@@ -213,7 +213,7 @@ const Checkin: React.FC = () => {
             <Card
               className={`rounded-2xl transition-all duration-300 ${item.check_status === 1 ? "bg-green-50 border-green-200" : "bg-white"}`}
               hoverable
-              bodyStyle={{ padding: "16px" }}
+              styles={{ body: { padding: "16px" } }}
             >
               <div className="flex items-center justify-between mb-4">
                 <Space size={12}>
@@ -234,7 +234,7 @@ const Checkin: React.FC = () => {
               <Input
                 placeholder="添加打卡备注..."
                 defaultValue={item.item_remark}
-                bordered={false}
+                variant="borderless"
                 className="bg-black/5 rounded-lg text-sm px-3 py-1.5"
                 onPressEnter={(e: any) => handleRemarkChange(item, e.target.value)}
                 onBlur={(e: any) => handleRemarkChange(item, e.target.value)}
@@ -363,7 +363,7 @@ const Checkin: React.FC = () => {
               value={targetDate}
               onChange={(val) => val && setTargetDate(val)}
               allowClear={false}
-              bordered={false}
+              variant="borderless"
               className="font-medium text-center"
               format="YYYY-MM-DD"
             />
@@ -373,41 +373,44 @@ const Checkin: React.FC = () => {
       </div>
 
       {/* 功能切换标签页 */}
-      <Tabs activeKey={activeTab} onChange={setActiveTab} className="custom-tabs" size="large">
-        <TabPane
-          tab={
-            <span>
-              <CheckCircleFilled style={{ marginRight: 8 }} />
-              每日打卡
-            </span>
+      <Tabs 
+        activeKey={activeTab} 
+        onChange={setActiveTab} 
+        className="custom-tabs" 
+        size="large"
+        items={[
+          {
+            key: 'daily',
+            label: (
+              <span>
+                <CheckCircleFilled style={{ marginRight: 8 }} />
+                每日打卡
+              </span>
+            ),
+            children: renderDailyView()
+          },
+          {
+            key: 'manage',
+            label: (
+              <span>
+                <SettingOutlined style={{ marginRight: 8 }} />
+                项管理
+              </span>
+            ),
+            children: renderManageView()
+          },
+          {
+            key: 'history',
+            label: (
+              <span>
+                <HistoryOutlined style={{ marginRight: 8 }} />
+                记录
+              </span>
+            ),
+            children: renderHistoryView()
           }
-          key="daily"
-        >
-          {renderDailyView()}
-        </TabPane>
-        <TabPane
-          tab={
-            <span>
-              <SettingOutlined style={{ marginRight: 8 }} />
-              项管理
-            </span>
-          }
-          key="manage"
-        >
-          {renderManageView()}
-        </TabPane>
-        <TabPane
-          tab={
-            <span>
-              <HistoryOutlined style={{ marginRight: 8 }} />
-              记录
-            </span>
-          }
-          key="history"
-        >
-          {renderHistoryView()}
-        </TabPane>
-      </Tabs>
+        ]}
+      />
 
       {/* 新增/编辑打卡项弹窗 */}
       <Modal
@@ -415,7 +418,7 @@ const Checkin: React.FC = () => {
         open={isItemModalOpen}
         onCancel={() => setIsItemModalOpen(false)}
         onOk={() => itemForm.submit()}
-        destroyOnClose
+        destroyOnHidden={true}
       >
         <Form form={itemForm} layout="vertical" onFinish={handleItemSubmit} initialValues={{ status: 1 }}>
           <Form.Item name="item_name" label="项目名称" rules={[{ required: true, message: "请输入打卡项名称" }, { max: 50 }]}>

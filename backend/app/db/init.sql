@@ -84,14 +84,54 @@ CREATE TABLE IF NOT EXISTS `checkin_record` (
 
 -- 4.8 体重记录表
 CREATE TABLE IF NOT EXISTS `weight_record` (
-    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-    `user_id` BIGINT NOT NULL,
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '体重记录唯一ID',
+    `user_id` BIGINT NOT NULL COMMENT '关联用户ID',
     `weight` DECIMAL(5, 1) NOT NULL COMMENT '体重（kg）',
-    `record_date` DATE NOT NULL,
-    `week_num` VARCHAR(10) NOT NULL COMMENT 'YYYYWW',
-    `remark` VARCHAR(200) DEFAULT NULL,
-    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `record_date` DATE NOT NULL COMMENT '记录日期',
+    `week_num` VARCHAR(10) NOT NULL COMMENT '所属自然周（YYYYWW）',
+    `remark` VARCHAR(200) DEFAULT NULL COMMENT '录入备注',
+    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     UNIQUE INDEX `uk_user_date` (`user_id`, `record_date`),
     INDEX `idx_user_week` (`user_id`, `week_num`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- 4.9 体重目标表
+CREATE TABLE IF NOT EXISTS `weight_target` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '目标唯一ID',
+    `user_id` BIGINT NOT NULL COMMENT '关联用户ID',
+    `target_weight` DECIMAL(5, 1) NOT NULL COMMENT '目标体重（kg）',
+    `start_weight` DECIMAL(5, 1) DEFAULT NULL COMMENT '起始体重（kg）',
+    `start_date` DATE DEFAULT NULL COMMENT '开始日期',
+    `deadline` DATE DEFAULT NULL COMMENT '截止日期',
+    `is_active` TINYINT(1) DEFAULT 1 COMMENT '是否当前活跃目标',
+    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE INDEX `uk_user_active` (`user_id`, `is_active`),
+    INDEX `idx_user_id` (`user_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- --- 模拟数据 ---
+
+-- 1. 默认用户 (admin / 123456)
+-- 密码 '123456' 的 bcrypt 哈希值（示例）: $2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6L6s57OTWzFiGvju
+INSERT INTO `user` (`id`, `username`, `password`, `nickname`) VALUES (1, 'admin', '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6L6s57OTWzFiGvju', '管理员') ON DUPLICATE KEY UPDATE id=id;
+
+-- 2. 体重记录模拟数据 (近两周)
+-- 假设今天是 2026-01-29 (周四)，所属周为 202605
+INSERT IGNORE INTO `weight_record` (`user_id`, `weight`, `record_date`, `week_num`, `remark`) VALUES 
+(1, 75.5, '2026-01-19', '202604', '周一记录'),
+(1, 75.2, '2026-01-20', '202604', '空腹'),
+(1, 75.8, '2026-01-21', '202604', '晚餐后'),
+(1, 75.1, '2026-01-22', '202604', '晨起'),
+(1, 74.9, '2026-01-23', '202604', '晨起'),
+(1, 75.3, '2026-01-24', '202604', '周末'),
+(1, 75.0, '2026-01-25', '202604', '周末'),
+(1, 74.8, '2026-01-26', '202605', '本周一'),
+(1, 74.6, '2026-01-27', '202605', '空腹'),
+(1, 74.7, '2026-01-28', '202605', '晨起'),
+(1, 74.5, '2026-01-29', '202605', '今日记录');
+
+-- 3. 体重目标模拟数据
+INSERT IGNORE INTO `weight_target` (`user_id`, `target_weight`, `start_weight`, `start_date`, `is_active`) VALUES
+(1, 70.0, 75.5, '2026-01-19', 1);

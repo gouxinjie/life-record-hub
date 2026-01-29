@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Card, Statistic, List, Typography, Space, Button, Progress, Tag } from 'antd';
+import { Row, Col, Card, Statistic, List, Typography, Space, Button, Progress, Tag, Modal, Form, InputNumber, Input, message } from 'antd';
 import {
     EditOutlined,
     CheckCircleOutlined,
@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { getNotes } from '../services/note';
 import { getTodos } from '../services/todo';
 import { getDailyCheckin } from '../services/checkin';
-import { getWeightRecords } from '../services/weight';
+import { getWeightRecords, addWeightRecord } from '../services/weight';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
@@ -27,6 +27,8 @@ const Dashboard: React.FC = () => {
         latestWeight: 0
     });
     const [loading, setLoading] = useState(true);
+    const [isWeightModalOpen, setIsWeightModalOpen] = useState(false);
+    const [weightForm] = Form.useForm();
 
     useEffect(() => {
         fetchDashboardData();
@@ -39,7 +41,7 @@ const Dashboard: React.FC = () => {
                 getNotes({ limit: 3 }),
                 getTodos({ status: 0 }),
                 getDailyCheckin(dayjs().format('YYYY-MM-DD')),
-                getWeightRecords()
+                getWeightRecords({ limit: 5 })
             ]);
 
             const dailyCheckin = dailyCheckinData.items || [];
@@ -51,10 +53,24 @@ const Dashboard: React.FC = () => {
                 todos: todos.slice(0, 3),
                 checkinProgress: totalCheckin > 0 ? Math.round((completedCheckin / totalCheckin) * 100) : 0,
                 checkinStats: { completed: completedCheckin, total: totalCheckin },
-                latestWeight: weightRecords.length > 0 ? weightRecords[weightRecords.length - 1].weight : 0
+                latestWeight: weightRecords.length > 0 ? weightRecords[0].weight : 0
             });
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleWeightSubmit = async (values: any) => {
+        try {
+            await addWeightRecord({
+                ...values,
+                record_date: dayjs().format('YYYY-MM-DD')
+            });
+            message.success('记录成功');
+            setIsWeightModalOpen(false);
+            fetchDashboardData();
+        } catch (error) {
+            // Error handled by interceptor
         }
     };
 
@@ -92,7 +108,7 @@ const Dashboard: React.FC = () => {
                     </Card>
                 </Col>
                 <Col xs={24} sm={12} lg={6}>
-                    <Card hoverable className="rounded-2xl">
+                    <Card hoverable className="rounded-2xl" onClick={() => navigate('/weight')}>
                         <Statistic
                             title="当前体重"
                             value={stats.latestWeight}
@@ -100,7 +116,21 @@ const Dashboard: React.FC = () => {
                             suffix="kg"
                             prefix={<LineChartOutlined />}
                         />
-                        <Text type="secondary" className="text-xs">保持健康生活习惯</Text>
+                        <div className="flex justify-between items-center mt-2">
+                            <Text type="secondary" className="text-xs">保持健康生活习惯</Text>
+                            <Button 
+                                type="primary" 
+                                size="small" 
+                                icon={<PlusOutlined />} 
+                                className="bg-green-500 rounded-lg text-[10px]"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsWeightModalOpen(true);
+                                }}
+                            >
+                                快速记录
+                            </Button>
+                        </div>
                     </Card>
                 </Col>
                 <Col xs={24} sm={12} lg={6}>
@@ -162,6 +192,25 @@ const Dashboard: React.FC = () => {
                     </Card>
                 </Col>
             </Row>
+
+            <Modal
+                title="快速记录体重"
+                open={isWeightModalOpen}
+                onOk={() => weightForm.submit()}
+                onCancel={() => setIsWeightModalOpen(false)}
+                okText="记录"
+                cancelText="取消"
+                destroyOnHidden={true}
+            >
+                <Form form={weightForm} layout="vertical" onFinish={handleWeightSubmit} className="mt-4">
+                    <Form.Item name="weight" label="今日体重 (kg)" rules={[{ required: true, type: 'number', min: 30, max: 200 }]}>
+                        <InputNumber className="w-full" step={0.1} placeholder="请输入当前体重" autoFocus />
+                    </Form.Item>
+                    <Form.Item name="remark" label="备注" rules={[{ max: 200 }]}>
+                        <Input placeholder="晨起空腹、运动后等" />
+                    </Form.Item>
+                </Form>
+            </Modal>
         </div>
     );
 };
