@@ -51,7 +51,23 @@ def run_init_sql() -> None:
     
     temp_engine.dispose()
 
+def drop_database() -> None:
+    """删除数据库"""
+    db_url = settings.DATABASE_URL
+    db_name = db_url.split('/')[-1].split('?')[0] # 从 URL 中提取数据库名
+    base_url = db_url.rsplit('/', 1)[0] + '/'
+    
+    temp_engine = create_engine(base_url)
+    with temp_engine.connect() as conn:
+        print(f"正在删除数据库 '{db_name}' (如果存在)...")
+        conn.execute(text(f"DROP DATABASE IF EXISTS `{db_name}`"))
+        conn.commit()
+    temp_engine.dispose()
+
 def init_db() -> None:
+    # 0. 删除数据库 (确保完全重新初始化)
+    drop_database()
+
     # 1. 优先执行原生 SQL 初始化 (包含创建库和表逻辑)
     run_init_sql()
     

@@ -431,13 +431,13 @@ const RecipeList: React.FC = () => {
               )}
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-4">
               <section>
                 <Title level={5} className="flex items-center gap-2 !mb-4 text-gray-800">
                   <div className="w-1 h-5 bg-orange-400 rounded-full" />
                   食材清单
                 </Title>
-                <div className="bg-orange-50/20 p-4 rounded-xl border border-orange-100/30">
+                <div className="bg-orange-50/20 p-2 rounded-xl border border-orange-100/30">
                   <div className="text-gray-700 leading-relaxed text-[15px] whitespace-pre-wrap">{previewRecipe.ingredients}</div>
                 </div>
               </section>
