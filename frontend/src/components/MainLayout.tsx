@@ -34,18 +34,22 @@ const MainLayout: React.FC = () => {
     navigate("/login");
   };
 
-  const menuItems = routes.map((item) => ({
-    key: item.path,
-    icon: item.icon || <BookOutlined />,
-    label: item.name,
-    children:
-      item.children?.length && item.module !== "todo"
-        ? item.children.map((child) => ({
-            key: child.path,
-            label: child.name
-          }))
-        : null
-  }));
+  const menuItems = routes
+    .filter((item) => item.name)
+    .map((item) => ({
+      key: item.path,
+      icon: item.icon || <BookOutlined />,
+      label: item.name,
+      children:
+        item.children?.length && item.module !== "todo"
+          ? item.children
+              .filter((child) => child.name)
+              .map((child) => ({
+                key: child.path,
+                label: child.name
+              }))
+          : null
+    }));
 
   const userMenuItems = [
     {

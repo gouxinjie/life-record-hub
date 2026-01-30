@@ -4,7 +4,8 @@ import {
     CheckSquareOutlined,
     CalendarOutlined,
     DashboardOutlined,
-    LineChartOutlined
+    LineChartOutlined,
+    CoffeeOutlined
 } from '@ant-design/icons';
 
 export interface RouteConfig {
@@ -67,5 +68,11 @@ export const routes: RouteConfig[] = [
         name: '体重记录',
         icon: <LineChartOutlined />,
         module: 'weight'
+    },
+    {
+        path: '/recipe',
+        name: '我的食谱',
+        icon: <CoffeeOutlined />,
+        module: 'recipe'
     }
 ];

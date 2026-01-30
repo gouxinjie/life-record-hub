@@ -4,3 +4,4 @@ from app.models.note import Note
 from app.models.todo import Todo
 from app.models.checkin import CheckinItem, CheckinRecord
 from app.models.weight import WeightRecord
+from app.models.recipe import Recipe

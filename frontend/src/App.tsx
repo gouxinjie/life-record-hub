@@ -5,6 +5,7 @@ import NoteList from "./pages/Note";
 import TodoList from "./pages/Todo";
 import Checkin from "./pages/Checkin/index";
 import Weight from "./pages/Weight/index";
+import RecipeList from "./pages/Recipe/index";
 import Dashboard from "./pages/Dashboard";
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
@@ -35,6 +36,7 @@ function App() {
           <Route path="todo/*" element={<TodoList />} />
           <Route path="checkin/*" element={<Checkin />} />
           <Route path="weight/*" element={<Weight />} />
+          <Route path="recipe/*" element={<RecipeList />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -6,13 +6,15 @@ import {
     LineChartOutlined,
     PlusOutlined,
     RightOutlined,
-    ArrowRightOutlined
+    ArrowRightOutlined,
+    CoffeeOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { getNotes } from '../services/note';
 import { getTodos } from '../services/todo';
 import { getDailyCheckin } from '../services/checkin';
 import { getWeightRecords, addWeightRecord } from '../services/weight';
+import { getRecipes } from '../services/recipe';
 import dayjs from 'dayjs';
 import { useTheme } from '../context/ThemeContext';
 
@@ -25,6 +27,7 @@ const Dashboard: React.FC = () => {
     const [stats, setStats] = useState({
         notes: [],
         todos: [],
+        recipes: [],
         checkinProgress: 0,
         checkinStats: { completed: 0, total: 0 },
         latestWeight: 0
@@ -40,11 +43,12 @@ const Dashboard: React.FC = () => {
     const fetchDashboardData = async () => {
         setLoading(true);
         try {
-            const [notes, todos, dailyCheckinData, weightRecords]: any = await Promise.all([
+            const [notes, todos, dailyCheckinData, weightRecords, recipes]: any = await Promise.all([
                 getNotes({ limit: 3 }),
                 getTodos({ status: 0 }),
                 getDailyCheckin(dayjs().format('YYYY-MM-DD')),
-                getWeightRecords({ limit: 5 })
+                getWeightRecords({ limit: 5 }),
+                getRecipes({ limit: 3 })
             ]);
 
             const dailyCheckin = dailyCheckinData.items || [];
@@ -54,6 +58,7 @@ const Dashboard: React.FC = () => {
             setStats({
                 notes: notes,
                 todos: todos.slice(0, 3),
+                recipes: recipes,
                 checkinProgress: totalCheckin > 0 ? Math.round((completedCheckin / totalCheckin) * 100) : 0,
                 checkinStats: { completed: completedCheckin, total: totalCheckin },
                 latestWeight: weightRecords.length > 0 ? weightRecords[0].weight : 0
@@ -149,9 +154,21 @@ const Dashboard: React.FC = () => {
                         </Space>
                     </Card>
                 </Col>
+                <Col xs={24} sm={12} lg={6}>
+                    <Card hoverable className="rounded-2xl">
+                        <Statistic
+                             title="已存菜谱"
+                             value={stats.recipes.length}
+                             suffix="道"
+                             valueStyle={{ color: '#faad14' }}
+                             prefix={<CoffeeOutlined />}
+                         />
+                        <Text type="secondary" className="text-xs">记录生活美味</Text>
+                    </Card>
+                </Col>
             </Row>
 
-            <Row gutter={[24, 24]} className="mt-6">
+            <Row gutter={[24, 24]} className="mt-8">
                 <Col xs={24} lg={12}>
                     <Card
                         title={<Space><EditOutlined /> 最近笔记</Space>}

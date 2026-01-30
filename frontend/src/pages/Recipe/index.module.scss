@@ -1,0 +1,138 @@
+.recipePageContainer {
+  padding: 0;
+
+  :global {
+    .ant-card {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #d9d9d9;
+      transition: all 0.25s ease;
+      
+      .ant-card-cover {
+        position: relative;
+        overflow: hidden;
+        height: 160px;
+        background: #fdfdfd;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.4s ease;
+        }
+
+        .card-star {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          z-index: 2;
+          width: 28px;
+          height: 28px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(255, 255, 255, 0.85);
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+          transition: all 0.2s ease;
+
+          &:hover {
+            transform: scale(1.1);
+            background: #fff;
+          }
+
+          svg {
+            font-size: 16px;
+          }
+        }
+      }
+
+      .ant-card-body {
+        padding: 12px;
+      }
+
+      .ant-card-actions {
+        background: #fff;
+        border-top: 1px solid #d9d9d9;
+        margin: 0;
+        padding: 0;
+        
+        li {
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 33.33% !important;
+          border-inline-end: 1px solid #d9d9d9 !important;
+
+          &:last-child {
+            border-inline-end: none !important;
+          }
+          
+          span {
+            display: block !important;
+          }
+        }
+      }
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+        border-color: #e8e8e8;
+
+        .ant-card-cover {
+          img {
+            transform: scale(1.06);
+          }
+        }
+      }
+    }
+
+    .custom-tabs {
+      .ant-tabs-nav {
+        margin-bottom: 20px;
+        background: #fff;
+        padding: 0 12px;
+        border-radius: 8px;
+        
+        &::before {
+          border-bottom: 1px solid #f0f0f0;
+        }
+      }
+      
+      .ant-tabs-tab {
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+.recipeCardInfo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  color: #555;
+  font-size: 13px;
+  font-weight: 500;
+
+  .infoItem {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    
+    svg {
+      font-size: 14px;
+      color: #888;
+    }
+  }
+}
+
+.ingredientSummary {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f5f5f5;
+  color: #666;
+  font-size: 12px;
+  line-height: 1.5;
+}
