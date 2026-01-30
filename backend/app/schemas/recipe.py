@@ -12,7 +12,7 @@ class RecipeBase(BaseModel):
     duration: Optional[int] = None
     difficulty: Optional[str] = "简单"
     remark: Optional[str] = None
-    is_starred: int = 0
+    is_starred: Optional[int] = 0
 
 class RecipeCreate(RecipeBase):
     pass
@@ -31,9 +31,9 @@ class RecipeUpdate(BaseModel):
 class RecipeOut(RecipeBase):
     id: int
     user_id: int
-    is_delete: int
-    create_time: datetime
-    update_time: datetime
+    is_delete: Optional[int] = 0
+    create_time: Optional[datetime] = None
+    update_time: Optional[datetime] = None
     
     model_config = {
         "from_attributes": True

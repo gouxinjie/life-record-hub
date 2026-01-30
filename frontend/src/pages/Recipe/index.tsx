@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { List, Card, Button, Input, Space, Tag, Modal, Form, Typography, Empty, Select, Row, Col, InputNumber, App, Tooltip, Tabs } from "antd";
+import { List, Card, Button, Input, Space, Tag, Modal, Form, Typography, Empty, Select, Row, Col, InputNumber, App, Tooltip, Tabs, Skeleton } from "antd";
 import {
   PlusOutlined,
   SearchOutlined,
@@ -25,6 +25,10 @@ const RecipeList: React.FC = () => {
   // State
   const [recipes, setRecipes] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [skip, setSkip] = useState(0);
+  const LIMIT = 12; // 增加到12个（3行），大部分屏幕首屏能铺满
+
   const [keyword, setKeyword] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -39,24 +43,76 @@ const RecipeList: React.FC = () => {
     困难: "red"
   };
 
-  const fetchRecipes = useCallback(async () => {
+  const loadingRef = React.useRef(false);
+  const sentinelRef = React.useRef<HTMLDivElement | null>(null);
+  const observerRef = React.useRef<IntersectionObserver | null>(null);
+
+  const fetchRecipes = useCallback(async (isRefresh = false) => {
+    if (loadingRef.current || (!hasMore && !isRefresh)) return;
+    
+    loadingRef.current = true;
     setLoading(true);
+    const currentSkip = isRefresh ? 0 : skip;
+    
     try {
       const data: any = await getRecipes({
         category: currentCategory === "全部" ? undefined : currentCategory,
-        keyword: keyword
+        keyword: keyword,
+        skip: currentSkip,
+        limit: LIMIT
       });
-      setRecipes(data);
+      
+      if (isRefresh) {
+        setRecipes(data);
+        setSkip(LIMIT);
+        setHasMore(data.length === LIMIT);
+      } else {
+        setRecipes(prev => [...prev, ...data]);
+        setSkip(prev => prev + LIMIT);
+        setHasMore(data.length === LIMIT);
+      }
     } catch (error) {
       console.error(error);
+      messageApi.error("加载失败");
     } finally {
+      loadingRef.current = false;
       setLoading(false);
     }
+  }, [currentCategory, keyword, skip, hasMore]);
+
+  useEffect(() => {
+    fetchRecipes(true);
   }, [currentCategory, keyword]);
 
   useEffect(() => {
-    fetchRecipes();
-  }, [fetchRecipes]);
+    if (!sentinelRef.current) return;
+
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    if (!hasMore) return;
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting && !loadingRef.current && hasMore) {
+          fetchRecipes();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "200px",
+        threshold: 0
+      }
+    );
+
+    observerRef.current.observe(sentinelRef.current);
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, [fetchRecipes, hasMore]);
 
   const handleCreate = () => {
     setEditingRecipe(null);
@@ -88,7 +144,7 @@ const RecipeList: React.FC = () => {
       onOk: async () => {
         await deleteRecipe(id);
         messageApi.success("已删除");
-        fetchRecipes();
+        fetchRecipes(true);
       }
     });
   };
@@ -97,7 +153,8 @@ const RecipeList: React.FC = () => {
     e.stopPropagation();
     try {
       await updateRecipe(recipe.id, { is_starred: recipe.is_starred ? 0 : 1 });
-      fetchRecipes();
+      // 局部更新状态，不触发全量刷新
+      setRecipes(prev => prev.map(r => r.id === recipe.id ? { ...r, is_starred: recipe.is_starred ? 0 : 1 } : r));
     } catch (error) {
       messageApi.error("操作失败");
     }
@@ -114,7 +171,7 @@ const RecipeList: React.FC = () => {
         messageApi.success("创建成功");
       }
       setIsModalOpen(false);
-      fetchRecipes();
+      fetchRecipes(true);
     } catch (error) {
       console.error(error);
     }
@@ -135,7 +192,7 @@ const RecipeList: React.FC = () => {
             placeholder="搜索菜谱..."
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            onPressEnter={fetchRecipes}
+            onPressEnter={() => fetchRecipes(true)}
             className="w-[250px] rounded-lg"
           />
           <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate} className="bg-primary rounded-lg">
@@ -154,80 +211,109 @@ const RecipeList: React.FC = () => {
         }))}
       />
 
-      <List
-        grid={{ gutter: 12, xs: 1, sm: 2, md: 3, lg: 4, xl: 4, xxl: 4 }}
-        loading={loading}
-        dataSource={recipes}
-        locale={{ emptyText: <Empty description="暂无菜谱，点击新增开始记录" /> }}
-        renderItem={(item: any) => (
-          <List.Item className="h-full">
-            <Card
-              hoverable
-              className="h-full group"
-              onClick={() => handlePreview(item)}
-              cover={
-                <div className="ant-card-cover">
-                  <div className="card-star" onClick={(e) => handleToggleStar(item, e)}>
-                    {item.is_starred ? <StarFilled className="text-yellow-400" /> : <StarOutlined className="text-gray-300 hover:text-yellow-400" />}
-                  </div>
-                  <img
-                    alt={item.name}
-                    src={item.image_url || "https://images.unsplash.com/photo-1495521821757-a1efb6729352?q=80&w=500&auto=format&fit=crop"}
-                  />
-                </div>
-              }
-              actions={[
-                <Tooltip title="查看详情" key="view">
-                  <div className="flex items-center justify-center w-full h-full py-2 hover:bg-blue-50 transition-colors group/btn">
-                    <EyeOutlined className="text-lg text-gray-400 group-hover/btn:text-primary" />
-                  </div>
-                </Tooltip>,
-                <Tooltip title="编辑菜谱" key="edit">
-                  <div
-                    className="flex items-center justify-center w-full h-full py-2 hover:bg-green-50 transition-colors group/btn"
-                    onClick={(e) => handleEdit(item, e)}
+      {loading && skip === 0 ? (
+        <Row gutter={[12, 12]}>
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <Col key={i} xs={24} sm={12} md={8} lg={6}>
+              <Card className="h-full">
+                <Skeleton active avatar paragraph={{ rows: 3 }} />
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      ) : (
+        <List
+          grid={{ gutter: 12, xs: 1, sm: 2, md: 3, lg: 4, xl: 4, xxl: 4 }}
+          dataSource={recipes}
+          locale={{ emptyText: <Empty description="暂无菜谱，点击新增开始记录" /> }}
+          loadMore={
+            loading && skip === 0 ? null : (
+              <div className="text-center my-8">
+                {loading && <div className="text-gray-400 animate-pulse">正在加载更多...</div>}
+                {!loading && hasMore && recipes.length > 0 && (
+                  <Button
+                    type="link"
+                    onClick={() => fetchRecipes()}
+                    className="text-gray-400 hover:text-primary"
                   >
-                    <EditOutlined className="text-lg text-gray-400 group-hover/btn:text-green-500" />
-                  </div>
-                </Tooltip>,
-                <Tooltip title="删除菜谱" key="delete">
-                  <div
-                    className="flex items-center justify-center w-full h-full py-2 hover:bg-red-50 transition-colors group/btn"
-                    onClick={(e) => handleDelete(item.id, e)}
-                  >
-                    <DeleteOutlined className="text-lg text-gray-400 group-hover/btn:text-red-500" />
-                  </div>
-                </Tooltip>
-              ]}
-            >
-              <Title level={5} className="!m-0 mb-2 truncate text-sm" title={item.name}>
-                {item.name}
-              </Title>
-
-              <div className={styles.recipeCardInfo}>
-                <div className={styles.infoItem}>
-                  <ClockCircleOutlined />
-                  <span>{item.duration || 0} 分钟</span>
-                </div>
-                <div className={styles.infoItem}>
-                  <Tag
-                    color={difficultyColors[item.difficulty] || "blue"}
-                    className="m-0 border-none px-2 py-0 text-[11px] font-bold leading-5 h-5 rounded"
-                  >
-                    {item.difficulty}
-                  </Tag>
-                </div>
+                    加载更多
+                  </Button>
+                )}
+                {!hasMore && recipes.length > 0 && <div className="text-gray-300">—— 已经到底啦 ——</div>}
+                <div ref={sentinelRef} className="h-1" />
               </div>
+            )
+          }
+          renderItem={(item: any) => (
+            <List.Item className="h-full">
+              <Card
+                hoverable
+                className="h-full group"
+                onClick={() => handlePreview(item)}
+                cover={
+                  <div className="ant-card-cover">
+                    <div className="card-star" onClick={(e) => handleToggleStar(item, e)}>
+                      {item.is_starred ? <StarFilled className="text-yellow-400" /> : <StarOutlined className="text-gray-300 hover:text-yellow-400" />}
+                    </div>
+                    <img
+                      alt={item.name}
+                      src={item.image_url || "https://images.unsplash.com/photo-1495521821757-a1efb6729352?q=80&w=500&auto=format&fit=crop"}
+                    />
+                  </div>
+                }
+                actions={[
+                  <Tooltip title="查看详情" key="view">
+                    <div className="flex items-center justify-center w-full h-full py-2 hover:bg-blue-50 transition-colors group/btn">
+                      <EyeOutlined className="text-lg text-gray-400 group-hover/btn:text-primary" />
+                    </div>
+                  </Tooltip>,
+                  <Tooltip title="编辑菜谱" key="edit">
+                    <div
+                      className="flex items-center justify-center w-full h-full py-2 hover:bg-green-50 transition-colors group/btn"
+                      onClick={(e) => handleEdit(item, e)}
+                    >
+                      <EditOutlined className="text-lg text-gray-400 group-hover/btn:text-green-500" />
+                    </div>
+                  </Tooltip>,
+                  <Tooltip title="删除菜谱" key="delete">
+                    <div
+                      className="flex items-center justify-center w-full h-full py-2 hover:bg-red-50 transition-colors group/btn"
+                      onClick={(e) => handleDelete(item.id, e)}
+                    >
+                      <DeleteOutlined className="text-lg text-gray-400 group-hover/btn:text-red-500" />
+                    </div>
+                  </Tooltip>
+                ]}
+              >
+                <Title level={5} className="!m-0 mb-2 truncate text-sm" title={item.name}>
+                  {item.name}
+                </Title>
 
-              <div className={styles.ingredientSummary}>
-                <Paragraph ellipsis={{ rows: 2 }} className="!m-0 text-gray-500">
-                  {item.ingredients}
-                </Paragraph>
-              </div>
-            </Card>
-          </List.Item>
-        )}
-      />
+                <div className={styles.recipeCardInfo}>
+                  <div className={styles.infoItem}>
+                    <ClockCircleOutlined />
+                    <span>{item.duration || 0} 分钟</span>
+                  </div>
+                  <div className={styles.infoItem}>
+                    <Tag
+                      color={difficultyColors[item.difficulty] || "blue"}
+                      className="m-0 border-none px-2 py-0 text-[11px] font-bold leading-5 h-5 rounded"
+                    >
+                      {item.difficulty}
+                    </Tag>
+                  </div>
+                </div>
+
+                <div className={styles.ingredientSummary}>
+                  <Paragraph ellipsis={{ rows: 2 }} className="!m-0 text-gray-500">
+                    {item.ingredients}
+                  </Paragraph>
+                </div>
+              </Card>
+            </List.Item>
+          )}
+        />
+      )}
 
       {/* Recipe Edit Modal */}
       <Modal

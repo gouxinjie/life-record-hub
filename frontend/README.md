@@ -5,7 +5,9 @@
 - React 18
 - TypeScript
 - Vite
-- Ant Design (绿色主调)
+- Ant Design 5.x
+- Tailwind CSS
+- SCSS
 - Axios
 - React Router Dom v6
 - Recharts (图表)
@@ -15,13 +17,13 @@
 1. **安装依赖**
 
 ```bash
-npm install
+pnpm install
 ```
 
 2. **启动开发服务器**
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ## 设计规范

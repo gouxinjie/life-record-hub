@@ -2,11 +2,14 @@
 
 ## 技术栈
 
-- Python 3.9+
+- Python 3.8+
 - FastAPI
-- SQLAlchemy 2.0 (ORM)
-- Pydantic 2.0 (数据校验)
+- SQLAlchemy 2.x (ORM)
+- Pydantic 2.x (数据校验)
 - MySQL 8.0
+- Uvicorn
+- PyMySQL
+- Alembic
 
 ## 目录结构
 
@@ -33,10 +36,18 @@ venv\Scripts\activate     # Windows
 pip install -r requirements.txt
 ```
 
-3. **配置环境变量** 修改 `.env` 文件中的数据库连接信息。
+3. **配置环境变量**
 
-4. **启动应用**
+修改 `.env` 文件中的数据库连接信息。
+
+4. **初始化数据库（首次运行）**
 
 ```bash
-uvicorn app.main:app --reload
+python app/db/init_db.py
+```
+
+5. **启动应用**
+
+```bash
+uvicorn app.main:app --reload --port 8000
 ```
