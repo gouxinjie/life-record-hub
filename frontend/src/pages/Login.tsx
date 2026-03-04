@@ -8,6 +8,7 @@ const { Title, Text } = Typography;
 
 const Login: React.FC = () => {
     const { message } = App.useApp();
+    const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [isLogin, setIsLogin] = useState(true);
     const navigate = useNavigate();
@@ -19,16 +20,21 @@ const Login: React.FC = () => {
         }
     }, [navigate]);
 
+    React.useEffect(() => {
+        if (isLogin) {
+            form.setFieldsValue({ username: 'admin', password: '123456' });
+        }
+    }, [isLogin, form]);
+
     const onFinish = async (values: any) => {
         setLoading(true);
         try {
             if (isLogin) {
-                // 后端 OAuth2 格式要求用 FormData
-                const formData = new FormData();
-                formData.append('username', values.username);
-                formData.append('password', values.password);
+                const params = new URLSearchParams();
+                params.append('username', values.username);
+                params.append('password', values.password);
 
-                const res: any = await login(formData);
+                const res: any = await login(params);
                 localStorage.setItem('token', res.access_token);
                 message.success('登录成功');
                 // 使用硬跳转确保整个 App 重新加载并进入 AuthGuard 的受控制范围
@@ -42,8 +48,13 @@ const Login: React.FC = () => {
                 message.success('注册成功，请登录');
                 setIsLogin(true);
             }
-        } catch (error) {
-            // 错误已在拦截器中处理
+        } catch (error: any) {
+            const detail = error?.response?.data?.detail as string | undefined;
+            if (!isLogin && error?.response?.status === 400 && detail && detail.includes('已注册')) {
+                message.info('该账号已存在，已切换到登录');
+                setIsLogin(true);
+                form.setFieldsValue({ username: values.username, password: values.password });
+            }
         } finally {
             setLoading(false);
         }
@@ -62,12 +73,15 @@ const Login: React.FC = () => {
                             MyNote {isLogin ? '登录' : '注册'}
                         </Title>
                         <Text type="secondary">个人在线笔记 & 待办管理系统</Text>
+                        {isLogin && <Text type="secondary">默认账号：admin / 密码：123456</Text>}
+                        {!isLogin && <Text type="secondary">提示：默认账号已存在，请直接使用 admin / 123456 登录</Text>}
                     </Space>
                 </div>
 
                 <Form
+                    form={form}
                     name="auth_form"
-                    initialValues={{ remember: true }}
+                    initialValues={{ username: 'admin', password: '123456' }}
                     onFinish={onFinish}
                     size="large"
                 >
@@ -119,6 +133,18 @@ const Login: React.FC = () => {
                             {isLogin ? '立即登录' : '注册账户'}
                         </Button>
                     </Form.Item>
+
+                    {isLogin && (
+                        <Form.Item>
+                            <Button
+                                type="default"
+                                onClick={() => form.submit()}
+                                block
+                            >
+                                一键登录
+                            </Button>
+                        </Form.Item>
+                    )}
 
                     <div className="text-center">
                         <Button
