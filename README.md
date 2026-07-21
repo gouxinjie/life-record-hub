@@ -4,6 +4,28 @@
 
 ---
 
+## 📸 项目截图
+
+<img src="imgs/life-record-hub.png" alt="仪表盘" width="600" />
+
+---
+
+<img src="imgs/life-record-hub-1.png" alt="笔记管理" width="600" />
+
+---
+
+<img src="imgs/life-record-hub-2.png" alt="待办事项" width="600" />
+
+---
+
+<img src="imgs/life-record-hub-3.png" alt="每日打卡" width="600" />
+
+---
+
+<img src="imgs/life-record-hub-4.png" alt="体重记录" width="600" />
+
+---
+
 ## 🚀 快速开始
 
 本项目采用前后端分离的结构进行开发与管理。
